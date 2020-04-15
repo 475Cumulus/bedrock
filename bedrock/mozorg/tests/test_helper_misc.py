@@ -12,6 +12,7 @@ from django_jinja.backend import Jinja2
 from jinja2 import Markup
 from mock import patch
 from pyquery import PyQuery as pq
+from lib.l10n_utils.fluent import fluent_l10n
 
 from bedrock.base.templatetags.helpers import static
 from bedrock.mozorg.templatetags import misc
@@ -172,10 +173,13 @@ class TestVideoTag(TestCase):
     moz_video = 'http://videos.mozilla.org/serv/flux/example.%s'
     nomoz_video = 'http://example.org/example.%s'
 
+    def get_l10n(self, locale):
+        return fluent_l10n([locale, 'en'], settings.FLUENT_DEFAULT_FILES)
+
     def _render(self, template):
         req = self.rf.get('/')
         req.locale = 'en-US'
-        return render(template, {'request': req})
+        return render(template, {'request': req, 'fluent_l10n': self.get_l10n(req.locale)})
 
     def test_empty(self):
         # No video, no output.
